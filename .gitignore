@@ -1,2 +1,5 @@
 # Linux file browser info
 .directory
+# Generated test data
+/tests/referenceOutputs
+/tests/testOutputs
