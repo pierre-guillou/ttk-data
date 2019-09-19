@@ -39,7 +39,7 @@ function compareOutputs(){
     for file in tests/$1Outputs/${case}/*; do
       file=${file/tests\//}
       file=${file/${1}Outputs\//}
-      diff tests/$1Outputs/$file tests/$2Outputs/$file 
+      diff -q tests/$1Outputs/$file tests/$2Outputs/$file
     done
   done
 }
