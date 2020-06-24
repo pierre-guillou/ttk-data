@@ -52,6 +52,7 @@ pointCloudcsv = CSVReader(FileName=['pointCloud.csv'])
 tTKDimensionReduction1 = TTKDimensionReduction(Input=pointCloudcsv,
     ModulePath='default')
 tTKDimensionReduction1.InputColumns = ['Points:0', 'Points:1', 'Points:2']
+tTKDimensionReduction1.UseAllCores = False
 
 # create a new 'Table To Points'
 tableToPoints2 = TableToPoints(Input=tTKDimensionReduction1)
