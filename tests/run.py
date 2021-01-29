@@ -6,9 +6,9 @@ from paraview import simple
 
 
 def gen_screenshot(state):
-    print(f"Processing {state}")
+    print(f"Processing {state.name}")
     for i, view in enumerate(simple.GetViews()):
-        simple.SaveScreenshot(f"{state}_{i}.png", view)
+        simple.SaveScreenshot(f"tests/{state.stem}_{i}.png", view)
         print(f"{state}: view #{i} saved")
     simple.ResetSession()
 
