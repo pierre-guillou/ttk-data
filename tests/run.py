@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 import pathlib
 
 from paraview import simple
@@ -24,7 +25,9 @@ def process_py(state):
 
 
 def main():
-    p = pathlib.Path(".") / "states"
+    p = pathlib.Path(os.path.realpath(__file__)).parents[1]
+    os.chdir(p)
+    p = p / "states"
     patterns = {"*.pvsm": process_psvm, "*.py": process_py}
     for k, v in patterns.items():
         for state in sorted(p.glob(k)):
