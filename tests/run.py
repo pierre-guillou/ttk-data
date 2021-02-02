@@ -1,15 +1,19 @@
 import multiprocessing
 import os
 import pathlib
+import time
 
 from paraview import simple
 
 
 def gen_screenshot(state):
     print(f"Processing {state.name}")
+    start_time = time.time()
     for i, view in enumerate(simple.GetViews()):
         simple.SaveScreenshot(f"tests/{state.stem}_{i}.png", view)
         print(f"{state}: view #{i} saved")
+    duration = time.time() - start_time
+    print(f"Processed {state.name} (took {duration:.2f}s)")
     simple.ResetSession()
 
 
