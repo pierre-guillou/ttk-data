@@ -1,0 +1,60 @@
+name: rendering
+
+on:
+  push:
+    # triggered on tag pushes with tags beginning with either "v" or "dev"
+    branches:
+      - 'dev'
+  pull_request:
+    # also triggered by pull requests on the "dev" branch
+    branches:
+      - 'dev'
+
+jobs:
+  test-windows:
+    runs-on: windows-latest
+
+    env:
+      CONDA_ROOT: C:\Miniconda
+      MESA_GL_VERSION_OVERRIDE: 4.5
+      GALLIUM_DRIVER: llvmpipe
+
+    steps:
+
+    - uses: actions/checkout@v2
+      name: Checkout ttk-data
+
+    - uses: s-weigand/setup-conda@v1
+
+    - name: Install dependencies with conda
+      shell: bash
+      run: |
+        conda install -c conda-forge paraview
+        echo "$CONDA_ROOT/Library/bin" >> $GITHUB_PATH
+
+    - name: Remove hosted Python
+      shell: bash
+      run: |
+        rm -rf C:/hostedtoolcache/windows/Python
+
+    - name: Fetch OpenGL software implementation
+      run: |
+        Invoke-WebRequest `
+          -OutFile mesa3d-20.3.4-release-msvc.7z `
+          -Uri https://github.com/pal1000/mesa-dist-win/releases/download/21.0.1/mesa3d-21.0.1-release-mingw.7z
+
+    - name: Install OpenGL software implementation
+      shell: bash
+      run: |
+        mkdir mesa-dist-win
+        cd mesa-dist-win
+        7z x ../mesa3d-20.3.4-release-msvc.7z
+        mv -v x64/*.dll "$CONDA_ROOT/Library/bin"
+
+    - name: Run ttk-data states
+      shell: cmd
+      run: |
+        set PYTHONPATH=%CONDA_ROOT%\Lib
+        python -c "import os, json;print(json.dumps(dict(os.environ), indent=4))"
+        python tests\run.py
+        dir tests
