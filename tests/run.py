@@ -1,4 +1,5 @@
 import argparse
+import json
 import multiprocessing
 import os
 import pathlib
@@ -17,6 +18,7 @@ def gen_screenshot(state):
 
 def process_pvsm(state):
     print(f"Loading {state}...")
+    print(json.dumps(dict(os.environ), indent=4))
     simple.LoadState(str(state))
     print("Generating screenshot...")
     gen_screenshot(state)
