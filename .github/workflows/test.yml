@@ -4,11 +4,11 @@ on:
   push:
     # triggered on tag pushes with tags beginning with either "v" or "dev"
     branches:
-      - 'dev'
+      - 'tmp'
   pull_request:
     # also triggered by pull requests on the "dev" branch
     branches:
-      - 'dev'
+      - 'tmp'
 
 jobs:
   test-windows:
