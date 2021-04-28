@@ -7,13 +7,9 @@ from paraview import simple
 
 
 def gen_screenshot(state):
-    print(f"Processing {state.name}")
-    start_time = time.time()
     for i, view in enumerate(simple.GetViews()):
         simple.SaveScreenshot(f"tests/{state.stem}_{i}.png", view)
         print(f"{state}: view #{i} saved")
-    duration = time.time() - start_time
-    print(f"Processed {state.name} (took {duration:.2f}s)")
     simple.ResetSession()
 
 
@@ -35,10 +31,16 @@ def main():
     patterns = {"*.pvsm": process_psvm, "*.py": process_py}
     for k, v in patterns.items():
         for state in sorted(p.glob(k)):
+            print(f"Processing {state.name}")
+            start_time = time.time()
+
             # keep instances isolated (fix segfaults)
             proc = multiprocessing.Process(target=v, args=(state,))
             proc.start()
             proc.join()
+
+            duration = time.time() - start_time
+            print(f"Processed {state.name} (took {duration:.2f}s)")
 
 
 if __name__ == "__main__":
