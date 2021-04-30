@@ -1,3 +1,4 @@
+import argparse
 import multiprocessing
 import os
 import pathlib
@@ -13,7 +14,7 @@ def gen_screenshot(state):
     simple.ResetSession()
 
 
-def process_psvm(state):
+def process_pvsm(state):
     simple.LoadState(str(state))
     gen_screenshot(state)
 
@@ -24,11 +25,11 @@ def process_py(state):
     gen_screenshot(state)
 
 
-def main():
+def run_all():
     p = pathlib.Path(os.path.realpath(__file__)).parents[1]
     os.chdir(p)
     p = p / "states"
-    patterns = {"*.pvsm": process_psvm, "*.py": process_py}
+    patterns = {"*.pvsm": process_pvsm, "*.py": process_py}
     for k, v in patterns.items():
         for state in sorted(p.glob(k)):
             print(f"Processing {state.name}")
@@ -41,6 +42,29 @@ def main():
 
             duration = time.time() - start_time
             print(f"Processed {state.name} (took {duration:.2f}s)")
+
+
+def run_one(state_file):
+    if not state_file.exists():
+        raise FileNotFoundError
+
+    patterns = {".pvsm": process_pvsm, ".py": process_py}
+    patterns[state_file.suffix](state_file)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Run either one or all state files, generate a screenshot per view"
+    )
+    parser.add_argument(
+        "-i", "--input_state", type=pathlib.Path, help="State file to process"
+    )
+    args = parser.parse_args()
+
+    if args.input_state:
+        run_one(args.input_state)
+    else:
+        run_all()
 
 
 if __name__ == "__main__":
