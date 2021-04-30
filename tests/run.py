@@ -21,6 +21,7 @@ def process_pvsm(state):
 
 def process_py(state):
     with open(state, "r") as st:
+        # pylint: disable=W0122
         exec(st.read())
     gen_screenshot(state)
 
