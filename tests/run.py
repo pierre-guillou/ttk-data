@@ -26,31 +26,29 @@ def process_py(state):
     gen_screenshot(state)
 
 
-def run_all():
-    p = pathlib.Path(os.path.realpath(__file__)).parents[1]
-    os.chdir(p)
-    p = p / "states"
-    patterns = {"*.pvsm": process_pvsm, "*.py": process_py}
-    for k, v in patterns.items():
-        for state in sorted(p.glob(k)):
-            print(f"Processing {state.name}")
-            start_time = time.time()
-
-            # keep instances isolated (fix segfaults)
-            proc = multiprocessing.Process(target=v, args=(state,))
-            proc.start()
-            proc.join()
-
-            duration = time.time() - start_time
-            print(f"Processed {state.name} (took {duration:.2f}s)")
-
-
 def run_one(state_file):
     if not state_file.exists():
         raise FileNotFoundError
 
-    patterns = {".pvsm": process_pvsm, ".py": process_py}
-    patterns[state_file.suffix](state_file)
+    print(f"Processing {state_file.name}")
+    start_time = time.time()
+
+    {".pvsm": process_pvsm, ".py": process_py}[state_file.suffix](state_file)
+
+    duration = round(time.time() - start_time, 3)
+    print(f"Processed {state_file.name} (took {duration}s)")
+
+
+def run_all():
+    p = pathlib.Path(os.path.realpath(__file__)).parents[1]
+    os.chdir(p)
+    p = p / "states"
+    for gl in ["*.pvsm", "*.py"]:
+        for state in sorted(p.glob(gl)):
+            # keep instances isolated (fix segfaults)
+            proc = multiprocessing.Process(target=run_one, args=(state,))
+            proc.start()
+            proc.join()
 
 
 def main():
