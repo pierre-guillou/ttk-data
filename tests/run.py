@@ -1,3 +1,5 @@
+import sys; sys.path.append("/c/Miniconda/Lib")
+
 import argparse
 import faulthandler
 import json
