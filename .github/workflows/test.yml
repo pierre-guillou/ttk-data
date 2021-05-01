@@ -42,5 +42,5 @@ jobs:
       shell: cmd
       run: |
         set PYTHONPATH=%CONDA_ROOT%\Lib
-        python -X dev tests\run.py -i states\dragon.pvsm
+        pvpython --force-offscreen-rendering tests\run.py -i states\dragon.pvsm
         dir tests
