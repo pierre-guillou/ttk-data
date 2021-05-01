@@ -39,8 +39,8 @@ jobs:
         rm -rf C:/hostedtoolcache/windows/Python
 
     - name: Run ttk-data states
-      shell: cmd
+      shell: bash
       run: |
-        set PYTHONPATH=%CONDA_ROOT%\Lib
-        pvpython --force-offscreen-rendering tests\run.py -i states\dragon.pvsm
-        dir tests
+        export PYTHONPATH="$CONDA_ROOT/Lib"
+        pvpython --force-offscreen-rendering tests/run.py -i states/dragon.pvsm
+        ls -l tests
