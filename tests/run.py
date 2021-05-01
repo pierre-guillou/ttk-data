@@ -1,4 +1,5 @@
 import argparse
+import faulthandler
 import json
 import multiprocessing
 import os
@@ -6,6 +7,8 @@ import pathlib
 import time
 
 from paraview import simple
+
+faulthandler.enable()
 
 
 def gen_screenshot(state):
