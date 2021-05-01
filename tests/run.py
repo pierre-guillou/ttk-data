@@ -9,14 +9,18 @@ from paraview import simple
 
 def gen_screenshot(state):
     for i, view in enumerate(simple.GetViews()):
+        print(f"Generating view #{i}")
         simple.SaveScreenshot(f"tests/{state.stem}_{i}.png", view)
         print(f"{state}: view #{i} saved")
     simple.ResetSession()
 
 
 def process_pvsm(state):
+    print(f"Loading {state}...")
     simple.LoadState(str(state))
+    print("Generating screenshot...")
     gen_screenshot(state)
+    print("Screenshot generated...")
 
 
 def process_py(state):
