@@ -39,10 +39,8 @@ jobs:
         rm -rf C:/hostedtoolcache/windows/Python
 
     - name: Run ttk-data states
-      shell: bash
+      shell: cmd
       run: |
-        export PYTHON=$(which python)
-        gdb -batch \
-          --ex "run" \
-          --ex "bt" \
-          --args "/c/Miniconda/python tests\run.py -i states\dragon.pvsm"
+        set PYTHONPATH=%CONDA_ROOT%\Lib
+        python -X dev tests\run.py -i states\dragon.pvsm
+        dir tests
