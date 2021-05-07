@@ -38,9 +38,25 @@ jobs:
       run: |
         rm -rf C:/hostedtoolcache/windows/Python
 
+    - name: Fetch OpenGL software implementation
+      run: |
+        Invoke-WebRequest `
+          -OutFile mesa3d-20.3.4-release-msvc.7z `
+          -Uri https://github.com/pal1000/mesa-dist-win/releases/download/21.0.1/mesa3d-21.0.1-release-mingw.7z
+
+    - name: Install OpenGL software implementation
+      shell: bash
+      run: |
+        which python
+        which pvpython
+        ldd "$CONDA_ROOT/Library/bin/pvpython.exe"
+        mkdir mesa-dist-win
+        cd mesa-dist-win
+        7z x ../mesa3d-20.3.4-release-msvc.7z
+        mv -v x64/*.dll "$CONDA_ROOT/Library/bin"
+
     - name: Run ttk-data states
       shell: bash
       run: |
-        export PYTHONPATH="$CONDA_ROOT/Lib"
-        pvpython --force-offscreen-rendering tests/run.py -i states/dragon.pvsm
+        pvpython tests/run.py -i states/dragon.pvsm
         ls -l tests
