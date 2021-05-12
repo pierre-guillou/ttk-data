@@ -19,29 +19,74 @@ jobs:
       MESA_GL_VERSION_OVERRIDE: 4.5
       GALLIUM_DRIVER: llvmpipe
       QT_OPENGL: desktop
+      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+      PV_DIR: C:\Program Files\TTK-ParaView
 
     steps:
 
     - uses: actions/checkout@v2
       name: Checkout ttk-data
 
-    - uses: s-weigand/setup-conda@v1
+    - uses: actions/cache@v2
+      id: cache-ttk-paraview
+      with:
+        path: "ttk-paraview/build/ttk-paraview.exe"
+        key: ttk-paraview-${{ runner.os }}
 
-    - name: Install dependencies with conda
-      shell: bash
-      run: |
-        conda install -c conda-forge paraview
-        echo "$CONDA_ROOT/Library/bin" >> $GITHUB_PATH
+    - uses: actions/checkout@v2
+      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
+      with:
+        repository: "pierre-guillou/paraview-ttk"
+        ref: "test"
+        path: "ttk-paraview"
+      name: Checkout TTK-ParaView source code
+
+    - uses: s-weigand/setup-conda@v1
 
     - name: Remove hosted Python
       shell: bash
       run: |
         rm -rf C:/hostedtoolcache/windows/Python
 
+    - name: Create & configure ParaView build directory
+      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
+      shell: cmd
+      run: |
+        call "%VCVARS%"
+        cd ttk-paraview
+        mkdir build
+        cd build
+        cmake ^
+          -DPARAVIEW_USE_QT=OFF ^
+          -DVTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=ON ^
+          ..
+
+    - name: Build ParaView
+      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd ttk-paraview/build
+        cmake --build . --config Release --parallel
+
+    - name: Create ParaView package
+      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cd ttk-paraview/build
+        cpack -G NSIS64 || cat _CPack_Packages/win64/NSIS64/NSISOutput.log
+
+    - name: Install ParaView
+      shell: cmd
+      run: |
+        cd ttk-paraview/build
+        ttk-paraview.exe /S
+        # set PATH environment variable
+        echo "$PV_DIR/bin" >> $GITHUB_PATH
+
     - name: Fetch OpenGL software implementation
       run: |
         Invoke-WebRequest `
-          -OutFile mesa3d-20.3.4-release-msvc.7z `
+          -OutFile mesa3d.7z `
           -Uri https://github.com/pal1000/mesa-dist-win/releases/download/21.0.1/mesa3d-21.0.1-release-mingw.7z
 
     - name: Install OpenGL software implementation
@@ -49,14 +94,14 @@ jobs:
       run: |
         which python
         which pvpython
-        ldd "$CONDA_ROOT/Library/bin/pvpython.exe"
+        ldd "$PV_DIR/bin/pvpython.exe"
         mkdir mesa-dist-win
         cd mesa-dist-win
-        7z x ../mesa3d-20.3.4-release-msvc.7z
-        mv -v x64/*.dll "$CONDA_ROOT/Library/bin"
+        7z x ../mesa3d.7z
+        mv -v x64/* "$PV_DIR/bin"
 
     - name: Run ttk-data states
       shell: bash
       run: |
-        pvpython tests/run.py -i states/dragon.pvsm
+        pvpython -X dev tests/run.py -i states/dragon.pvsm
         ls -l tests
