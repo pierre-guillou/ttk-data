@@ -15,7 +15,6 @@ jobs:
     runs-on: windows-latest
 
     env:
-      CONDA_ROOT: C:\Miniconda
       MESA_GL_VERSION_OVERRIDE: 4.5
       GALLIUM_DRIVER: llvmpipe
       QT_OPENGL: desktop
@@ -33,13 +32,6 @@ jobs:
         ref: "test"
         path: "ttk-paraview"
       name: Checkout TTK-ParaView source code
-
-    - uses: s-weigand/setup-conda@v1
-
-    - name: Remove hosted Python
-      shell: bash
-      run: |
-        rm -rf C:/hostedtoolcache/windows/Python
 
     - name: Create & configure ParaView build directory
       shell: cmd
@@ -78,6 +70,7 @@ jobs:
         which python
         which pvpython
         ldd "$PV_DIR/bin/pvpython.exe"
+        ldd "$PV_DIR/bin/vtkRemotingCore-pv5.9.dll"
         mkdir mesa-dist-win
         cd mesa-dist-win
         7z x ../mesa3d.7z
@@ -86,7 +79,10 @@ jobs:
     - name: Run ttk-data states
       shell: bash
       run: |
-        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$PYTHONPATH"
-        python -X dev tests/run.py -i states/dragon.pvsm || true
+        export PYTHONPATH="C:/Program Files (x86)/ParaView/bin/Lib/site-packages"
+        export PATH="C:/Program Files (x86)/ParaView/bin:$PATH"
+        echo $PYTHONPATH
+        ls "$PYTHONPATH"
+        "C:/hostedtoolcache/windows/Python/3.9.5/x64/python3.exe" -X dev tests/run.py -i states/dragon.pvsm || true
         pvpython --help || true
         ls -l tests
