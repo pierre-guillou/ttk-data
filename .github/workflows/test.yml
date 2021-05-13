@@ -20,21 +20,14 @@ jobs:
       GALLIUM_DRIVER: llvmpipe
       QT_OPENGL: desktop
       VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-      PV_DIR: C:\Program Files\TTK-ParaView
+      PV_DIR: C:\Program Files (x86)\ParaView
 
     steps:
 
     - uses: actions/checkout@v2
       name: Checkout ttk-data
 
-    - uses: actions/cache@v2
-      id: cache-ttk-paraview
-      with:
-        path: "ttk-paraview/build/ttk-paraview.exe"
-        key: ttk-paraview-${{ runner.os }}
-
     - uses: actions/checkout@v2
-      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
       with:
         repository: "pierre-guillou/paraview-ttk"
         ref: "test"
@@ -49,7 +42,6 @@ jobs:
         rm -rf C:/hostedtoolcache/windows/Python
 
     - name: Create & configure ParaView build directory
-      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "%VCVARS%"
@@ -62,25 +54,16 @@ jobs:
           ..
 
     - name: Build ParaView
-      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
       shell: bash
       run: |
         cd ttk-paraview/build
         cmake --build . --config Release --parallel
 
-    - name: Create ParaView package
-      if: steps.cache-ttk-paraview.outputs.cache-hit != 'true'
+    - name: Install ParaView
       shell: bash
       run: |
         cd ttk-paraview/build
-        cpack -G NSIS64 || cat _CPack_Packages/win64/NSIS64/NSISOutput.log
-
-    - name: Install ParaView
-      shell: cmd
-      run: |
-        cd ttk-paraview/build
-        ttk-paraview.exe /S
-        # set PATH environment variable
+        cmake --install .
         echo "$PV_DIR/bin" >> $GITHUB_PATH
 
     - name: Fetch OpenGL software implementation
@@ -103,5 +86,7 @@ jobs:
     - name: Run ttk-data states
       shell: bash
       run: |
-        pvpython -X dev tests/run.py -i states/dragon.pvsm
+        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$PYTHONPATH"
+        python -X dev tests/run.py -i states/dragon.pvsm || true
+        pvpython --help || true
         ls -l tests
