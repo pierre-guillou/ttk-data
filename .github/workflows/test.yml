@@ -61,8 +61,9 @@ jobs:
           ..
 
     - name: Build ParaView
-      shell: bash
+      shell: cmd
       run: |
+        call "%VCVARS%"
         cd ttk-paraview/build
         cmake --build . --config Release --parallel
 
@@ -85,7 +86,6 @@ jobs:
         which python
         which pvpython
         ldd "$PV_DIR/bin/pvpython.exe"
-        ldd "$PV_DIR/bin/vtkRemotingCore-pv5.9.dll"
         mkdir mesa-dist-win
         cd mesa-dist-win
         7z x ../mesa3d.7z
@@ -100,6 +100,5 @@ jobs:
         echo $PYTHONPATH
         python -X dev -u tests/run.py -i states/dragon.pvsm || true
         sleep 2
-        ldd "$PV_DIR/bin/vtksys-pv5.9.dll"
         pvpython --help || true
         ls -l tests
