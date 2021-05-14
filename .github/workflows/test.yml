@@ -44,7 +44,7 @@ jobs:
     - name: Install some deps
       shell: bash
       run: |
-        conda install -c conda-forge qt boost
+        conda install -c conda-forge ninja
 
     - name: Create & configure ParaView build directory
       shell: cmd
@@ -57,6 +57,7 @@ jobs:
           -DPARAVIEW_USE_QT=OFF ^
           -DVTK_DEFAULT_RENDER_WINDOW_OFFSCREEN=ON ^
           -DPython3_ROOT_DIR="%CONDA_ROOT%" ^
+          -GNinja ^
           ..
 
     - name: Build ParaView
