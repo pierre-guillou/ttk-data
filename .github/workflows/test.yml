@@ -15,12 +15,12 @@ jobs:
     runs-on: windows-latest
 
     env:
-      CONDA_ROOT: C:\Miniconda
+      CONDA_ROOT: /c/Miniconda
       MESA_GL_VERSION_OVERRIDE: 4.5
       GALLIUM_DRIVER: llvmpipe
       QT_OPENGL: desktop
       VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-      PV_DIR: C:\Program Files (x86)\ParaView
+      PV_DIR: /c/Program Files (x86)/ParaView
 
     steps:
 
@@ -34,12 +34,16 @@ jobs:
         path: "ttk-paraview"
       name: Checkout TTK-ParaView source code
 
-    - uses: s-weigand/setup-conda@v1
-
     - name: Remove hosted Python
       shell: bash
       run: |
         rm -rf C:/hostedtoolcache/windows/Python
+
+    - uses: s-weigand/setup-conda@v1
+
+    - name: Install some deps
+      shell: bash
+      run: |
         conda install -c conda-forge qt boost
 
     - name: Create & configure ParaView build directory
@@ -84,15 +88,17 @@ jobs:
         mkdir mesa-dist-win
         cd mesa-dist-win
         7z x ../mesa3d.7z
-        mv -v x64/* "$PV_DIR/bin"
+        cp x64/* "$CONDA_ROOT"
+        cp -v x64/* "$PV_DIR/bin"
 
     - name: Run ttk-data states
       shell: bash
       run: |
-        export PYTHONPATH="C:/Program Files (x86)/ParaView/bin/Lib/site-packages:$CONDA_ROOT/Lib"
-        export PATH="C:/Program Files (x86)/ParaView/bin:$CONDA_ROOT:$CONDA_ROOT/bin:$PATH"
+        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$CONDA_ROOT/Lib"
+        export PATH="$PV_DIR/bin:$CONDA_ROOT:$CONDA_ROOT/bin:$PATH"
         echo $PYTHONPATH
-        ls "$PYTHONPATH"
-        python3.exe -X dev tests/run.py -i states/dragon.pvsm || true
+        python -X dev -u tests/run.py -i states/dragon.pvsm || true
+        sleep 2
+        ldd "$PV_DIR/bin/vtksys-pv5.9.dll"
         pvpython --help || true
         ls -l tests
