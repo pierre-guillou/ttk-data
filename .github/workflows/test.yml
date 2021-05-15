@@ -93,13 +93,11 @@ jobs:
         cp -v x64/* "$PV_DIR/bin"
 
     - name: Run ttk-data states
-      shell: bash
+      shell: cmd
       run: |
-        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$CONDA_ROOT/Lib"
-        export PATH="$PV_DIR/bin:$CONDA_ROOT:$CONDA_ROOT/bin:$PATH"
-        export LD_LIBRARY_PATH="$PATH"
-        echo $PYTHONPATH
-        python -X dev -u tests/run.py -i states/dragon.pvsm || true
-        sleep 2
-        pvpython --help || true
-        ls -l tests
+        set PYTHONPATH="%PV_DIR%\bin\Lib\site-packages;%CONDA_ROOT%\Lib"
+        set PATH="%PV_DIR%\bin;%CONDA_ROOT%;%CONDA_ROOT%\bin;%PATH%"
+        python.exe -X dev -u tests\run.py -i states\dragon.pvsm
+        timeout 3
+        pvpython.exe --help
+        dir tests
