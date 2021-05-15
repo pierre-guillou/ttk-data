@@ -97,6 +97,7 @@ jobs:
       run: |
         export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$CONDA_ROOT/Lib"
         export PATH="$PV_DIR/bin:$CONDA_ROOT:$CONDA_ROOT/bin:$PATH"
+        export LD_LIBRARY_PATH="$PATH"
         echo $PYTHONPATH
         python -X dev -u tests/run.py -i states/dragon.pvsm || true
         sleep 2
