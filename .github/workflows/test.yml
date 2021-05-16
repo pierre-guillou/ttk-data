@@ -15,12 +15,12 @@ jobs:
     runs-on: windows-latest
 
     env:
-      CONDA_ROOT: /c/Miniconda
+      CONDA_ROOT: C:\Miniconda
       MESA_GL_VERSION_OVERRIDE: 4.5
       GALLIUM_DRIVER: llvmpipe
       QT_OPENGL: desktop
       VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-      PV_DIR: /c/Program Files (x86)/ParaView
+      PV_DIR: C:\Program Files (x86)\ParaView
 
     steps:
 
