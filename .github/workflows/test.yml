@@ -95,9 +95,27 @@ jobs:
     - name: Run ttk-data states
       shell: cmd
       run: |
-        set PYTHONPATH="%PV_DIR%\bin\Lib\site-packages;%CONDA_ROOT%\Lib"
-        set PATH="%PV_DIR%\bin;%CONDA_ROOT%;%CONDA_ROOT%\bin;%PATH%"
-        "%CONDA_ROOT%\python" -X dev -u tests\run.py -i states\dragon.pvsm
+        set PV_DIR=C:\Program Files (x86)\ParaView
+        set PATH=%PATH%;%PV_DIR%\bin;C:\Miniconda;C:\Miniconda\bin
+        set PYTHONPATH=%PV_DIR%\bin\Lib\site-packages;C:\Miniconda\Lib
+        python -X dev -u tests\run.py -i states\dragon.pvsm
         ping -4 -n 35 "">nul
-        "%PV_DIR%\bin\pvpython" --help
+        pvpython --help
         dir tests
+
+    - name: Run ttk-data states
+      shell: bash
+      run: |
+        # set environment variables
+        export PV_BIN="/c/Program Files (x86)/ParaView/bin"
+        export CONDA_ROOT="/c/Miniconda"
+        export PATH="$PATH:$PV_BIN:$CONDA_ROOT"
+        export PYTHONPATH="$PV_BIN/Lib/site-packages:$CONDA_ROOT/Lib"
+        # pure python
+        python -X dev -u tests/run.py -i states/dragon.pvsm
+        sleep 2
+        ls -l tests
+        # pvpython
+        pvpython.exe -X dev -u tests/run.py -i states/dragon.pvsm
+        sleep 2
+        ls -l tests
