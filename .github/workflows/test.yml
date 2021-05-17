@@ -97,7 +97,7 @@ jobs:
       run: |
         set PYTHONPATH="%PV_DIR%\bin\Lib\site-packages;%CONDA_ROOT%\Lib"
         set PATH="%PV_DIR%\bin;%CONDA_ROOT%;%CONDA_ROOT%\bin;%PATH%"
-        python.exe -X dev -u tests\run.py -i states\dragon.pvsm
-        timeout 3
-        pvpython.exe --help
+        "%CONDA_ROOT%\python" -X dev -u tests\run.py -i states\dragon.pvsm
+        ping -4 -n 35 "">nul
+        "%PV_DIR%\bin\pvpython" --help
         dir tests
