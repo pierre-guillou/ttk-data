@@ -72,24 +72,6 @@ jobs:
         cmake --install .
         echo "$PV_DIR/bin" >> $GITHUB_PATH
 
-    - name: Fetch OpenGL software implementation
-      run: |
-        Invoke-WebRequest `
-          -OutFile mesa3d.7z `
-          -Uri https://github.com/pal1000/mesa-dist-win/releases/download/21.0.1/mesa3d-21.0.1-release-mingw.7z
-
-    - name: Install OpenGL software implementation
-      shell: bash
-      run: |
-        which python
-        which pvpython
-        ldd "$PV_DIR/bin/pvpython.exe"
-        mkdir mesa-dist-win
-        cd mesa-dist-win
-        7z x ../mesa3d.7z
-        cp x64/* "$CONDA_ROOT"
-        cp -v x64/* "$PV_DIR/bin"
-
     - name: Run ttk-data states
       shell: cmd
       run: |
@@ -111,7 +93,7 @@ jobs:
         # set environment variables
         export PV_BIN="/c/Program Files (x86)/ParaView/bin"
         export CONDA_ROOT="/c/Miniconda"
-        export PATH="$PATH:$PV_BIN:$CONDA_ROOT:$CONDA_ROOT/bin"
+        export PATH="$PATH:$PV_BIN:$CONDA_ROOT/bin"
         export PYTHONPATH="$PV_BIN/Lib/site-packages:$CONDA_ROOT/Lib"
         # pure python
         python -X dev -u tests/run.py -i states/dragon.pvsm || true
