@@ -76,7 +76,6 @@ jobs:
       shell: cmd
       run: |
         call "%VCVARS%"
-        set PV_DIR=C:\Program Files (x86)\ParaView
         set PATH=%PATH%;%PV_DIR%\bin
         set PYTHONPATH=%PV_DIR%\bin\Lib\site-packages;%CONDA_ROOT%\Lib
         echo python
@@ -84,17 +83,15 @@ jobs:
         echo ping
         ping -4 -n 35 "">nul
         echo pvpython
-        pvpython --help
+        pvpython test/run.py -i states/dragon.pvsm
         dir tests
 
     - name: Run ttk-data states
       shell: bash
       run: |
         # set environment variables
-        export PV_BIN="/c/Program Files (x86)/ParaView/bin"
-        export CONDA_ROOT="/c/Miniconda"
-        export PATH="$PATH:$PV_BIN:$CONDA_ROOT/bin"
-        export PYTHONPATH="$PV_BIN/Lib/site-packages:$CONDA_ROOT/Lib"
+        export PATH="$PATH:$PV_DIR/bin"
+        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$CONDA_ROOT/Lib"
         # pure python
         python -X dev -u tests/run.py -i states/dragon.pvsm || true
         sleep 2
