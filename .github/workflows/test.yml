@@ -21,7 +21,7 @@ jobs:
       QT_OPENGL: desktop
       VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
       PV_DIR: C:\Program Files (x86)\ParaView
-      PV_DEBUG_REMOTE_RENDERING: 1
+      PARAVIEW_LOG_RENDERING_VERBOSITY: 0
 
     steps:
 
@@ -88,7 +88,7 @@ jobs:
         echo ping
         ping -4 -n 35 "">nul
         echo pvpython
-        pvpython -v=9 tests/run.py -i states/dragon.pvsm
+        pvpython tests/run.py -i states/dragon.pvsm
         dir tests
 
     - name: Run ttk-data states
