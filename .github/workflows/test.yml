@@ -78,6 +78,7 @@ jobs:
         call "%VCVARS%"
         set PATH=%PATH%;%PV_DIR%\bin
         set PYTHONPATH=%PV_DIR%\bin\Lib\site-packages;%CONDA_ROOT%\Lib
+        set PV_DEBUG_REMOTE_RENDERING=0
         echo python
         python -X dev -u tests\run.py -i states\dragon.pvsm
         echo ping
@@ -91,7 +92,7 @@ jobs:
       run: |
         # set environment variables
         export PATH="$PATH:$PV_DIR/bin"
-        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:$CONDA_ROOT/Lib"
+        export PYTHONPATH="$PV_DIR/bin/Lib/site-packages:/c/Miniconda/Lib:$PYTHONPATH"
         # pure python
         python -X dev -u tests/run.py -i states/dragon.pvsm || true
         sleep 2
